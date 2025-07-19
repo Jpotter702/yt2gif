@@ -5,10 +5,12 @@ Convert any YouTube video into a shareable GIF in seconds.
 ## 🎯 Purpose
 
 yt2gif.app is a utility web app that allows users to:
-- Paste a YouTube link
-- Choose a start and end time
-- Render a high-quality GIF (with options for resolution, watermark, etc.)
-- Download and share instantly
+Input field for YouTube URL
+Video previewer
+Linear, visual range selector UI to select beginning, end and lengh of clip
+"Generate GIF" button
+Display final GIF with download and share links
+Ability to render both a high and low-quality GIF with or without watermark
 
 ---
 
@@ -24,7 +26,7 @@ yt2gif.app is a utility web app that allows users to:
 
 ---
 
-## 🛠 Tech Stack
+## 🛠 Tech Stack (TBD)
 
 - YouTube clip fetching
 - GIF rendering + watermarking
@@ -37,18 +39,11 @@ yt2gif.app is a utility web app that allows users to:
 
 ## 🧠 Roadmap
 
-### Phase 1 – Freemium MVP
-- [ ] GIF generation engine
+### Phase 1 – Freemium Model
+- [ ] Core funtionality
 - [ ] Free vs premium limits
-- [ ] Stripe or LemonSqueezy integration
-- [ ] Google AdSense banner placement
+- [ ] Payment processing integration
+- [ ] Banner and ad placement
 
-### Phase 2 – Integrations
-- [ ] Slack, Teams, Google Chat
-- [ ] Chrome extension (YouTube button)
-
-### Phase 3 – Monetization Expansion
+### Phase 2 – API 
 - [ ] Developer API (REST + key system)
-- [ ] Private-use licensing
-- [ ] Partner dashboard
-
