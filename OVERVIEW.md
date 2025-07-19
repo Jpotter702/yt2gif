@@ -11,7 +11,7 @@ Convert any YouTube video into a shareable GIF in seconds.
 
 GIFClip is a utility web app that allows users to:
 - Paste a YouTube link
-- Choose a start and end time
+- Present user with a frontend clip range selector, a linear drag and drop interface.
 - Render a high-quality GIF (with options for resolution, watermark, etc.)
 - Download and share instantly
 
