@@ -16,7 +16,15 @@ export class VideoProcessor {
   constructor() {
     this.tempDir = path.join(process.cwd(), 'temp')
     this.gifProcessor = new GifProcessor()
-    fs.ensureDirSync(this.tempDir)
+    
+    // Only ensure directory exists if not in build mode
+    if (typeof window === 'undefined' && process.env.NODE_ENV !== undefined) {
+      try {
+        fs.ensureDirSync(this.tempDir)
+      } catch (error) {
+        console.warn('Could not create temp directory:', error)
+      }
+    }
   }
 
   async downloadVideo(url: string): Promise<string> {
