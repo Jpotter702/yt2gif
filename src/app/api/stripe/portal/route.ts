@@ -2,8 +2,16 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { subscriptionManager } from '@/lib/subscription-manager'
+import { stripe } from '@/lib/stripe'
 
 export async function POST(request: NextRequest) {
+  if (!stripe) {
+    return NextResponse.json(
+      { error: 'Stripe not configured' },
+      { status: 503 }
+    )
+  }
+
   try {
     const session = await getServerSession(authOptions)
     

@@ -32,7 +32,7 @@ const safePostHog = {
   capture: (event: string, properties?: any) => {
     try {
       if (typeof window !== 'undefined' && posthog && process.env.NEXT_PUBLIC_POSTHOG_KEY) {
-        safePostHog.capture(event, properties)
+        posthog.capture(event, properties)
       }
     } catch (error) {
       // Silently fail analytics

@@ -5,6 +5,13 @@ import { stripe, PRICING_PLANS, PricingPlan } from '@/lib/stripe'
 import { subscriptionManager } from '@/lib/subscription-manager'
 
 export async function POST(request: NextRequest) {
+  if (!stripe) {
+    return NextResponse.json(
+      { error: 'Stripe not configured' },
+      { status: 503 }
+    )
+  }
+
   try {
     const session = await getServerSession(authOptions)
     

@@ -3,7 +3,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Performance optimizations (swcMinify is enabled by default in Next.js 13+)
-  
+
   // Image optimization
   images: {
     formats: ['image/webp', 'image/avif'],
@@ -58,6 +58,27 @@ const nextConfig = {
     ]
   },
 
+  // Rewrites for PostHog ingestion
+  async rewrites() {
+    return [
+      {
+        source: '/ingest/static/:path*',
+        destination: 'https://us-assets.i.posthog.com/static/:path*',
+      },
+      {
+        source: '/ingest/:path*',
+        destination: 'https://us.i.posthog.com/:path*',
+      },
+      {
+        source: '/ingest/decide',
+        destination: 'https://us.i.posthog.com/decide',
+      },
+    ]
+  },
+
+  // This is required to support PostHog trailing slash API requests
+  skipTrailingSlashRedirect: true,
+
   // Bundle analyzer for optimization
   webpack: (config, { isServer, dev }) => {
     // Optimize bundle size
@@ -110,6 +131,6 @@ const sentryWebpackPluginOptions = {
 
 module.exports = nextConfig
 // For production with Sentry, uncomment the following:
-// module.exports = process.env.NODE_ENV === 'production' 
+// module.exports = process.env.NODE_ENV === 'production'
 //   ? withSentryConfig(nextConfig, sentryWebpackPluginOptions)
 //   : nextConfig

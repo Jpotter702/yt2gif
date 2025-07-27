@@ -4,7 +4,7 @@ import { ToastProvider } from '@/components/toast'
 import { ErrorBoundary } from '@/components/error-boundary'
 import { PerformanceMonitor } from '@/components/performance-monitor'
 import { AutoStructuredData } from '@/components/structured-data'
-import { AnalyticsProvider, SentryErrorBoundary } from '@/components/analytics-provider'
+import { AnalyticsProvider } from '@/components/analytics-provider'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -54,18 +54,16 @@ export default function RootLayout({
         <AutoStructuredData />
       </head>
       <body className="min-h-screen bg-background font-sans antialiased">
-        <SentryErrorBoundary>
-          <ErrorBoundary>
-            <SessionWrapper>
-              <AnalyticsProvider>
-                <ToastProvider>
-                  <PerformanceMonitor />
-                  {children}
-                </ToastProvider>
-              </AnalyticsProvider>
-            </SessionWrapper>
-          </ErrorBoundary>
-        </SentryErrorBoundary>
+        <ErrorBoundary>
+          <SessionWrapper>
+            <AnalyticsProvider>
+              <ToastProvider>
+                <PerformanceMonitor />
+                {children}
+              </ToastProvider>
+            </AnalyticsProvider>
+          </SessionWrapper>
+        </ErrorBoundary>
       </body>
     </html>
   )

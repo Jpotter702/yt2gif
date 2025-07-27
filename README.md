@@ -177,6 +177,17 @@ choco install ffmpeg
 
 ## 📦 Deployment
 
+### Production-Ready Build
+
+This application is production-ready with:
+- ✅ **Optimized builds** with Next.js 15
+- ✅ **Security headers** and CSRF protection  
+- ✅ **Docker support** with multi-stage builds
+- ✅ **Health checks** at `/api/health`
+- ✅ **Error monitoring** with Sentry
+- ✅ **Analytics** with PostHog
+- ✅ **Graceful degradation** when services are unavailable
+
 ### Vercel (Recommended)
 
 1. **Install Vercel CLI**
@@ -190,7 +201,7 @@ choco install ffmpeg
    ```
 
 3. **Set up environment variables**
-   Configure your environment variables in the Vercel dashboard.
+   Configure your environment variables in the Vercel dashboard using the values from `.env.example`.
 
 4. **Set up database**
    For production, use a PostgreSQL database (Supabase, PlanetScale, or Neon):
@@ -198,7 +209,14 @@ choco install ffmpeg
    DATABASE_URL="postgresql://user:password@host:port/database"
    ```
 
+5. **Run database migrations**
+   ```bash
+   npm run db:migrate:prod
+   ```
+
 ### Docker Deployment
+
+The application includes a production-optimized Dockerfile:
 
 1. **Build the image**
    ```bash
@@ -207,27 +225,99 @@ choco install ffmpeg
 
 2. **Run the container**
    ```bash
-   docker run -p 3000:3000 --env-file .env yt2gif
+   docker run -p 3000:3000 --env-file .env.production yt2gif
    ```
+
+3. **Or use Docker Compose** (recommended for production)
+   ```bash
+   docker-compose up -d
+   ```
+
+### Other Platforms
+
+The application can be deployed to any Node.js hosting platform:
+- **Railway**: One-click deployment
+- **Render**: Auto-deploy from GitHub
+- **DigitalOcean App Platform**: Managed deployment
+- **AWS/GCP/Azure**: VM or container deployment
 
 ### Environment Setup
 
 #### Required Environment Variables
 
-- `DATABASE_URL`: Database connection string
-- `NEXTAUTH_URL`: Your app's URL
-- `NEXTAUTH_SECRET`: Random secret for JWT signing
-- `STRIPE_PUBLISHABLE_KEY`: Stripe public key
-- `STRIPE_SECRET_KEY`: Stripe secret key
+```env
+# Database
+DATABASE_URL="postgresql://user:password@host:port/database"
 
-#### Optional Environment Variables
+# Application
+NEXTAUTH_URL="https://yourdomain.com"
+NEXTAUTH_SECRET="your-secret-here-min-32-chars"
+NODE_ENV="production"
 
-- `GOOGLE_CLIENT_ID`: Google OAuth client ID
-- `GOOGLE_CLIENT_SECRET`: Google OAuth client secret
-- `GITHUB_ID`: GitHub OAuth app ID
-- `GITHUB_SECRET`: GitHub OAuth app secret
-- `NEXT_PUBLIC_POSTHOG_KEY`: PostHog analytics key
-- `NEXT_PUBLIC_SENTRY_DSN`: Sentry error tracking DSN
+# Video Processing
+FFMPEG_PATH="/usr/bin/ffmpeg"
+MAX_VIDEO_DURATION_SECONDS="300"
+MAX_FILE_SIZE_MB="100"
+```
+
+#### Payment Integration (Optional)
+
+```env
+# Stripe
+STRIPE_PUBLISHABLE_KEY="pk_live_..."
+STRIPE_SECRET_KEY="sk_live_..."
+STRIPE_WEBHOOK_SECRET="whsec_..."
+```
+
+#### Authentication Providers (Optional)
+
+```env
+# Google OAuth
+GOOGLE_CLIENT_ID="your-google-client-id"
+GOOGLE_CLIENT_SECRET="your-google-client-secret"
+
+# GitHub OAuth  
+GITHUB_ID="your-github-app-id"
+GITHUB_SECRET="your-github-app-secret"
+```
+
+#### Monitoring & Analytics (Optional)
+
+```env
+# Sentry (Error Monitoring)
+SENTRY_DSN="https://your-sentry-dsn"
+SENTRY_ORG="your-sentry-org"
+SENTRY_PROJECT="your-sentry-project"
+
+# PostHog (Analytics)
+NEXT_PUBLIC_POSTHOG_KEY="your-posthog-key"
+NEXT_PUBLIC_POSTHOG_HOST="https://us.i.posthog.com"
+```
+
+#### Performance & Caching (Optional)
+
+```env
+# Redis (for production caching)
+REDIS_URL="redis://localhost:6379"
+
+# Rate Limiting
+RATE_LIMIT_MAX_REQUESTS="100"
+RATE_LIMIT_WINDOW_MINUTES="15"
+```
+
+### Pre-Deployment Checklist
+
+Before deploying to production:
+
+- [ ] All environment variables configured
+- [ ] Database migrations run successfully
+- [ ] FFmpeg installed on target platform
+- [ ] Stripe webhooks configured (if using payments)
+- [ ] Domain and SSL certificate configured
+- [ ] Monitoring and alerting set up
+- [ ] Backup strategy implemented
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions.
 
 ## 🔧 Development
 

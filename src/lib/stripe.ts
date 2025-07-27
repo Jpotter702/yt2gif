@@ -1,13 +1,16 @@
 import Stripe from 'stripe'
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('STRIPE_SECRET_KEY is not set')
+// Allow builds without Stripe configuration
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY
+
+if (!stripeSecretKey && process.env.NODE_ENV === 'production') {
+  console.warn('STRIPE_SECRET_KEY is not set - Stripe functionality will be disabled')
 }
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+export const stripe = stripeSecretKey ? new Stripe(stripeSecretKey, {
   apiVersion: '2023-10-16',
   typescript: true,
-})
+}) : null
 
 export const PRICING_PLANS = {
   PREMIUM: {
@@ -59,6 +62,10 @@ export function formatPrice(cents: number): string {
 }
 
 export async function createOrRetrieveCustomer(email: string, userId: string): Promise<string> {
+  if (!stripe) {
+    throw new Error('Stripe not configured')
+  }
+
   // First, try to find existing customer
   const existingCustomers = await stripe.customers.list({
     email: email,

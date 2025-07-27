@@ -3,6 +3,10 @@ import { prisma } from './prisma'
 
 export class SubscriptionManager {
   async createCheckoutSession(userId: string, email: string, plan: PricingPlan) {
+    if (!stripe) {
+      throw new Error('Stripe not configured')
+    }
+
     try {
       const user = await prisma.user.findUnique({
         where: { id: userId },
@@ -55,6 +59,10 @@ export class SubscriptionManager {
   }
 
   async createPortalSession(userId: string) {
+    if (!stripe) {
+      throw new Error('Stripe not configured')
+    }
+
     try {
       const user = await prisma.user.findUnique({
         where: { id: userId },
@@ -126,6 +134,10 @@ export class SubscriptionManager {
   }
 
   async cancelSubscription(userId: string) {
+    if (!stripe) {
+      throw new Error('Stripe not configured')
+    }
+
     try {
       const user = await prisma.user.findUnique({
         where: { id: userId },
@@ -149,6 +161,10 @@ export class SubscriptionManager {
   }
 
   async resumeSubscription(userId: string) {
+    if (!stripe) {
+      throw new Error('Stripe not configured')
+    }
+
     try {
       const user = await prisma.user.findUnique({
         where: { id: userId },
@@ -188,7 +204,7 @@ export class SubscriptionManager {
       }
 
       let subscriptionStatus = null
-      if (user.stripeSubscriptionId) {
+      if (user.stripeSubscriptionId && stripe) {
         try {
           const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId)
           subscriptionStatus = {

@@ -4,6 +4,11 @@ import { prisma } from './prisma'
 export class PaymentRetryHandler {
   async handleFailedPayment(customerId: string, invoiceId: string, attemptCount: number) {
     try {
+      if (!stripe) {
+        console.error('Stripe not configured for payment retry handling')
+        return
+      }
+
       const user = await prisma.user.findUnique({
         where: { stripeCustomerId: customerId },
       })
@@ -105,6 +110,10 @@ export class PaymentRetryHandler {
 
   async retryFailedInvoice(invoiceId: string) {
     try {
+      if (!stripe) {
+        throw new Error('Stripe not configured')
+      }
+      
       const invoice = await stripe.invoices.pay(invoiceId, {
         payment_method: undefined, // Use default payment method
       })
@@ -124,6 +133,10 @@ export class PaymentRetryHandler {
 
   async updatePaymentMethod(customerId: string, paymentMethodId: string) {
     try {
+      if (!stripe) {
+        throw new Error('Stripe not configured')
+      }
+      
       // Attach payment method to customer
       await stripe.paymentMethods.attach(paymentMethodId, {
         customer: customerId,

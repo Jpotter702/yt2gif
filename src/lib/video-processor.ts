@@ -32,14 +32,14 @@ export class VideoProcessor {
     try {
       return await this.downloadWithYtdlCore(url, filePath)
     } catch (ytdlError) {
-      console.log('ytdl-core failed, attempting yt-dlp fallback:', ytdlError.message)
+      console.log('ytdl-core failed, attempting yt-dlp fallback:', ytdlError instanceof Error ? ytdlError.message : String(ytdlError))
       
       // Fallback to yt-dlp if available
       try {
         return await this.downloadWithYtDlp(url, filePath)
       } catch (ytdlpError) {
-        console.log('yt-dlp also failed:', ytdlpError.message)
-        throw new Error(`Both download methods failed. ytdl-core: ${ytdlError.message}, yt-dlp: ${ytdlpError.message}`)
+        console.log('yt-dlp also failed:', ytdlpError instanceof Error ? ytdlpError.message : String(ytdlpError))
+        throw new Error(`Both download methods failed. ytdl-core: ${ytdlError instanceof Error ? ytdlError.message : String(ytdlError)}, yt-dlp: ${ytdlpError instanceof Error ? ytdlpError.message : String(ytdlpError)}`)
       }
     }
   }
@@ -47,7 +47,7 @@ export class VideoProcessor {
   private async downloadWithYtdlCore(url: string, filePath: string): Promise<string> {
     const downloadOptions = [
       { quality: 'highest', filter: 'videoandaudio' },
-      { quality: 'highestvideo', filter: format => format.container === 'mp4' },
+      { quality: 'highestvideo', filter: (format: any) => format.container === 'mp4' },
       { quality: 'lowest', filter: 'videoandaudio' }
     ]
 
@@ -56,7 +56,7 @@ export class VideoProcessor {
         console.log(`ytdl-core attempt ${i + 1}:`, downloadOptions[i])
         
         return await new Promise<string>((resolve, reject) => {
-          const stream = ytdl(url, downloadOptions[i])
+          const stream = ytdl(url, downloadOptions[i] as any)
           const writeStream = fs.createWriteStream(filePath)
           let downloadStarted = false
           

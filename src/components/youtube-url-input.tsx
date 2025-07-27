@@ -6,7 +6,7 @@ import { PlayCircle } from 'lucide-react'
 import { VideoMetadata } from '@/types'
 import { LoadingButton } from './loading-spinner'
 import { useErrorHandler } from './error-handler'
-import { useAnalytics } from './analytics-provider'
+// import { useAnalytics } from './analytics-provider'
 
 interface YoutubeUrlInputProps {
   onVideoLoaded?: (metadata: VideoMetadata) => void
@@ -17,7 +17,8 @@ export function YoutubeUrlInput({ onVideoLoaded }: YoutubeUrlInputProps) {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   const { handleError, handleSuccess } = useErrorHandler()
-  const { trackVideoSubmission } = useAnalytics()
+  // Temporarily disable analytics to avoid browser caching issues
+  const trackVideoSubmission = () => {}
 
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -27,7 +28,7 @@ export function YoutubeUrlInput({ onVideoLoaded }: YoutubeUrlInputProps) {
     setIsLoading(true)
     
     // Track video URL submission
-    trackVideoSubmission(url)
+    // trackVideoSubmission(url) // TODO: Implement analytics tracking
     
     try {
       const response = await fetch('/api/metadata', {
