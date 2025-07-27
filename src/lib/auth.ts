@@ -6,6 +6,19 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import bcrypt from 'bcryptjs'
 import { prisma } from './prisma'
 
+// Build-safe adapter that only connects in production with proper DATABASE_URL
+const getBuildSafeAdapter = () => {
+  try {
+    // Only use adapter if we have a valid database URL and we're not in build mode
+    if (process.env.DATABASE_URL && process.env.DATABASE_URL !== 'file:./dev.db') {
+      return PrismaAdapter(prisma)
+    }
+    return undefined
+  } catch {
+    return undefined
+  }
+}
+
 // Build providers array conditionally based on available environment variables
 const buildProviders = () => {
   const providers: any[] = []
@@ -38,28 +51,38 @@ const buildProviders = () => {
         return null
       }
 
-      const user = await prisma.user.findUnique({
-        where: { email: credentials.email }
-      })
+      try {
+        // Only attempt database operations if we have a connection
+        if (!process.env.DATABASE_URL) {
+          return null
+        }
 
-      if (!user || !user.password) {
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email }
+        })
+
+        if (!user || !user.password) {
+          return null
+        }
+
+        const isPasswordValid = await bcrypt.compare(
+          credentials.password,
+          user.password
+        )
+
+        if (!isPasswordValid) {
+          return null
+        }
+
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          image: user.image,
+        }
+      } catch (error) {
+        console.debug('Auth credential check failed:', error)
         return null
-      }
-
-      const isPasswordValid = await bcrypt.compare(
-        credentials.password,
-        user.password
-      )
-
-      if (!isPasswordValid) {
-        return null
-      }
-
-      return {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        image: user.image,
       }
     }
   }))
@@ -68,7 +91,7 @@ const buildProviders = () => {
 }
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
+  adapter: getBuildSafeAdapter(),
   providers: buildProviders(),
   secret: process.env.NEXTAUTH_SECRET || 'fallback-secret-for-build-only',
   session: {
@@ -79,16 +102,23 @@ export const authOptions: NextAuthOptions = {
       if (token && session.user) {
         session.user.id = token.sub!
         
-        // Fetch user tier information
-        const user = await prisma.user.findUnique({
-          where: { id: token.sub! },
-          select: { tier: true, gifsCreated: true, storageUsed: true }
-        })
-        
-        if (user) {
-          session.user.tier = user.tier
-          session.user.gifsCreated = user.gifsCreated
-          session.user.storageUsed = user.storageUsed
+        // Only fetch user data if we have a database connection
+        try {
+          if (process.env.DATABASE_URL) {
+            const user = await prisma.user.findUnique({
+              where: { id: token.sub! },
+              select: { tier: true, gifsCreated: true, storageUsed: true }
+            })
+            
+            if (user) {
+              session.user.tier = user.tier
+              session.user.gifsCreated = user.gifsCreated
+              session.user.storageUsed = user.storageUsed
+            }
+          }
+        } catch (error) {
+          // Silently fail during build or when DB is unavailable
+          console.debug('Session callback database error:', error)
         }
       }
       return session
