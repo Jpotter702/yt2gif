@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "build:analyze": "ANALYZE=true next build",
+    "build": "prisma generate && next build",
+    "build:analyze": "prisma generate && ANALYZE=true next build",
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
@@ -26,7 +26,8 @@
     "deploy:build": "./deploy.sh build",
     "deploy:vercel": "./deploy.sh vercel",
     "deploy:docker": "./deploy.sh docker",
-    "deploy:migrate": "./deploy.sh migrate"
+    "deploy:migrate": "./deploy.sh migrate",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@next-auth/prisma-adapter": "^1.0.7",
